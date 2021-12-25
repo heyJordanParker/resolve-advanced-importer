@@ -1,0 +1,15 @@
+{
+    "resolvePath": "",
+    "sleepBetweenChecks": 5,
+    "folderPath": "",
+    "ignoredBinsEntry": "",
+    "removeExtraFiles": false,
+    "removeEmptyBins": false,
+    "ignoredFileExtensions": "json,ini",
+    "unzipArchives": false,
+    "deleteUnzippedArchives": false,
+    "importToBinPath": "Master",
+    "timelinesBinPath": "Master/Timelines",
+    "compoundClipsBinPath": "Master/Compound Clips",
+    "fusionCompsBinPath": "Master/Fusion Comps"
+}

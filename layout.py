@@ -255,7 +255,7 @@ def initializeExtraFunctionsFrame():
         print(f"Initialized Compound clips bin: {c.compoundClipsBin}")
         
 
-    compounClipsBinSelector = BinSelector(extraFunctionsFrame, c.compountClipsBinPath, selectCompoundClipsBin, True, width=23)
+    compounClipsBinSelector = BinSelector(extraFunctionsFrame, c.compoundClipsBinPath, selectCompoundClipsBin, True, width=23)
     compounClipsBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
     disabledControlsDuringImport.append(compounClipsBinSelector)
     
@@ -400,6 +400,7 @@ def showWindow():
         if c.importing.get() == True:
             messagebox.showerror("Quit", "Please stop the importer before quitting")
         elif messagebox.askokcancel("Quit", "Do you want to quit?"):
+            c.saveCache()
             mainWindow.destroy()
     
     mainWindow.protocol("WM_DELETE_WINDOW", mainWindow_onClose)

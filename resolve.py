@@ -1,18 +1,22 @@
 import sys
 import imp
 import os
-from init import resolvePath
+import json
 
 def GetResolve():
     scriptModule = None
     try:
         import fusionscript as scriptModule
     except ImportError:
+        with open("config.json", "r") as file:
+            data = json.load(file)
+            resolvePath = data["resolvePath"]
         # Look for an auto importer config path
         if resolvePath:
             try:
                 scriptModule = imp.load_dynamic("fusionscript", resolvePath)
             except ImportError:
+                print("[Resolve Importer] Failed to load resolve at config path: " + resolvePath)
                 pass
             
         if not scriptModule:

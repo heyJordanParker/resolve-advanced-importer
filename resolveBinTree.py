@@ -293,7 +293,7 @@ class ResolveBinTree:
                         continue
                     
                     # is the file ignored
-                    if c.ignoreFiles.get() and getFileExtensionFromPath(filePath) in ignoredFileExtensions:
+                    if getFileExtensionFromPath(filePath) in ignoredFileExtensions:
                         print(f"[{self.getName()}] Skipping ignored file (by extension) {filePath}")
                         continue
                     

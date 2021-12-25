@@ -9,3 +9,15 @@ Resolve is an amazing NLE but lacks a lot of the basic functionality and polish 
 ## How to use:
 
 I'll update this later
+
+## How to develop:
+
+Test with:
+```
+nodemon .\resolveAdvancedImporter.py 
+```
+
+Create installer with:
+```
+pyinstaller -F  --noconsole .\resolveAdvancedImporter.py && copy config.json dist\config.json
+```

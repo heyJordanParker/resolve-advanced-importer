@@ -18,10 +18,14 @@ unzipArchives = tk.BooleanVar(value = True)
 deleteUnzippedArchives = tk.BooleanVar(value = True)
 removeDeleteFiles = tk.BooleanVar(value = True)
 
-importToBinName = "Master/Test"
-timelinesBinName = None
+importToBinPath = "Master/Test"
+timelinesBinPath = "Master/Timelines"
+compountClipsBinPath = "Master/Compound Clips"
+fusionCompsBinPath = "Master/Fusion Comps"
 
 # Runtime
 importToBin = None
 timelinesBin = None
+compoundClipsBin = None
+fusionCompsBin = None
 ignoredBins = []

@@ -67,8 +67,9 @@ def initializeFolderPathFrame():
     
     def selectRootBin(e):
         c.importToBin = rootBinSelector.getSelectedBin()
+        print(f"Initialized Root bin: {c.importToBin}")
 
-    rootBinSelector = BinSelector(folderPathFrame, c.importToBinName, selectRootBin, False, width=23)
+    rootBinSelector = BinSelector(folderPathFrame, c.importToBinPath, selectRootBin, False, width=23)
     rootBinSelector.grid(row=2, column=2, columnspan=1, sticky=tk.W, padx=10)
     disabledControlsDuringImport.append(rootBinSelector)
         
@@ -229,8 +230,53 @@ def initializeConfigFrame():
     disabledControlsDuringImport.append(deleteUnzippedArchivesCheckbox)
 
 def initializeExtraFunctionsFrame():
-    
     currentRow = 0
+    
+    timelineBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all timelines to bin:")
+    timelineBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    
+    def selectTimelinesBin(e):
+        c.timelinesBin = timelineBinSelector.getSelectedBin()
+        print(f"Initialized Timelines bin: {c.timelinesBin}")
+
+    timelineBinSelector = BinSelector(extraFunctionsFrame, c.timelinesBinPath, selectTimelinesBin, True, width=23)
+    timelineBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    disabledControlsDuringImport.append(timelineBinSelector)
+    
+    selectTimelinesBin(None)
+    
+    currentRow += 1
+    
+    compoundClipsBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all compound clips to bin:")
+    compoundClipsBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    
+    def selectCompoundClipsBin(e):
+        c.compoundClipsBin = compounClipsBinSelector.getSelectedBin()
+        print(f"Initialized Compound clips bin: {c.compoundClipsBin}")
+        
+
+    compounClipsBinSelector = BinSelector(extraFunctionsFrame, c.compountClipsBinPath, selectCompoundClipsBin, True, width=23)
+    compounClipsBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    disabledControlsDuringImport.append(compounClipsBinSelector)
+    
+    selectCompoundClipsBin(None)
+    
+    currentRow += 1
+    
+    fusionCompsBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all fusion comps to bin:")
+    fusionCompsBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    
+    def selectFusionCompsBin(e):
+        c.fusionCompsBin = fusionCompsBinSelector.getSelectedBin()
+        print(f"Initialized Fusion comps bin: {c.fusionCompsBin}")
+
+    fusionCompsBinSelector = BinSelector(extraFunctionsFrame, c.fusionCompsBinPath, selectFusionCompsBin, True, width=23)
+    fusionCompsBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    disabledControlsDuringImport.append(fusionCompsBinSelector)
+    
+    selectFusionCompsBin(None)
+    
+    currentRow += 1
     
     manuallyRemoveLabel = ttk.Label(extraFunctionsFrame, text="Manually Remove:")
     manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, pady = (10,0), padx=(0, 160))
@@ -314,7 +360,7 @@ def initializeControlFrame():
         controlFrame,
         orient='horizontal',
         mode='indeterminate',
-        length=310,
+        length=280,
     )
     progressIndicator.grid(row = 2, column=0, columnspan=2, sticky=tk.W)
     progressIndicator.grid_remove()
@@ -323,12 +369,12 @@ def initializeControlFrame():
     def helpButton_Click():
         webbrowser.open(c.DOCUMENTATION_URL)
     
-    buttonWidth = 25
+    buttonWidth = 28
     
     helpButton = ttk.Button(controlFrame, text="Help", command=helpButton_Click, width = buttonWidth)
     helpButton.grid(row = 2, column=1, padx=(0,15))
     
-    startButton = ttk.Button(controlFrame, text='Start Auto Importer', command=ResolveImporter.toggleImport, width=buttonWidth)
+    startButton = ttk.Button(controlFrame, text='Start Importer', command=ResolveImporter.toggleImport, width=buttonWidth)
     startButton.grid(row = 2, column=2)
 
     def updateStartButtonText(*args):

@@ -49,7 +49,7 @@ class BinSelector(ttk.Combobox):
         
         if bin == defaultBin:
             selectedBinPath = masterBin.getPath() if masterBin else ""
-            print("Failed to find bin")
+            print("[Bin Selector] Failed to find bin")
             
         return bin
         

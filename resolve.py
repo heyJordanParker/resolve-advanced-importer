@@ -46,37 +46,6 @@ def GetResolve():
         raise ImportError("Could not locate module dependencies")
 
     return bmd.scriptapp("Resolve")
-    
-    
-    # try:
-    # # The PYTHONPATH needs to be set correctly for this import statement to work.
-    # # An alternative is to import the DaVinciResolveScript by specifying absolute path (see ExceptionHandler logic)
-    #     import DaVinciResolveScript as bmd
-    # except (ImportError, FileNotFoundError) as e:
-    #     try:
-    #         bmd = imp.load_source('DaVinciResolveScript', str(resolvePath) + "DaVinciResolveScript.py")
-    #     except (ImportError, FileNotFoundError) as e:
-    #         # No fallbacks ... report error:
-    #         print("Unable to find module DaVinciResolveScript - please ensure that the path in your config file is valid.")
-    #         print("Based on your config file, the module is expected to be located in: " + str(resolvePath))
-            
-    #         if sys.platform.startswith("darwin"):
-    #             expectedPath="/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting/Modules/"
-    #         elif sys.platform.startswith("win") or sys.platform.startswith("cygwin"):
-    #             import os
-    #             expectedPath=os.getenv('PROGRAMDATA') + "\\Blackmagic Design\\DaVinci Resolve\\Support\\Developer\\Scripting\\Modules\\"
-    #             os.startfile(expectedPath)
-    #         elif sys.platform.startswith("linux"):
-    #             expectedPath="/opt/resolve/libs/Fusion/Modules/"
-
-    #         # check if the default path has it...
-    #         try:
-    #             bmd = imp.load_source('DaVinciResolveScript', expectedPath+"DaVinciResolveScript.py")
-    #         except (ImportError, FileNotFoundError) as e:
-    #             # No fallbacks ... report error:
-    #             print("Unable to find module DaVinciResolveScript - please ensure that the module DaVinciResolveScript is discoverable by python")
-    #             print("For a default DaVinci Resolve installation, the module is expected to be located in: " + expectedPath)
-    #             sys.exit()
 
 resolve = GetResolve()
 projectManager = resolve.GetProjectManager()

@@ -6,6 +6,9 @@ from pathHelpers import *
 from resolve import (mediaPool)
 from clipTypes import ResolveClipTypes
 
+# Clip Name: c.GetClipProperty('Clip Name') # GetName doesn't work for all types
+# Clip Path c.GetClipProperty('File Path')
+
 class ResolveBinTree:
     BIN_PATH_SEPARATOR = "/"
     Instance = None
@@ -70,7 +73,10 @@ class ResolveBinTree:
     
     def findBinFromPath(self, path, default = None):
         if not isinstance(path, list):
-            path = path.split(self.BIN_PATH_SEPARATOR)
+            if not path:
+                path = []
+            else:
+                path = path.split(self.BIN_PATH_SEPARATOR)
         
         if len(path) == 0:
             print(f"[{self.getName()}] Error finding bin: path is empty")
@@ -124,6 +130,13 @@ class ResolveBinTree:
     def isIgnored(self):
         ignoredBinPaths = [b.getPath() for b in c.ignoredBins]
         
+        if c.timelinesBin:
+            ignoredBinPaths.append(c.timelinesBin.getPath())
+        if c.compoundClipsBin:
+            ignoredBinPaths.append(c.compoundClipsBin.getPath())
+        if c.fusionCompsBin:
+            ignoredBinPaths.append(c.fusionCompsBin.getPath())
+        
         for ignoredBinPath in ignoredBinPaths:
             if self.getPath() in ignoredBinPath and len(self.getPath()) >= len(ignoredBinPath):
                 return True
@@ -137,19 +150,19 @@ class ResolveBinTree:
         
         return timelines
     
-    def getFusionComps(self, recursive = True):
-        comps = []
-        
-        comps.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Fusion))
-        
-        return comps
-    
     def getCompoundClips(self, recursive = True):
         compoundClips = []
         
         compoundClips.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Compound))
         
         return compoundClips
+    
+    def getFusionComps(self, recursive = True):
+        comps = []
+        
+        comps.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Generator, ResolveClipTypes.Fusion))
+        
+        return comps
     
     def getClipsByType(self, recursive = True, respectIgnore = False, *clipTypes):
         clips = []
@@ -212,6 +225,12 @@ class ResolveBinTree:
                     bin.deleteChildBins(emptyChildBins)
                     
         return emptyBins
+    
+    def moveClipsToBin(self, clips, refresh = True):
+        mediaPool.MoveClips(clips, self.getBin())
+        
+        if refresh:
+            self.refresh()
     
     def deleteClips(self, files, deleteFiles = False, refresh = False):
         if not files:

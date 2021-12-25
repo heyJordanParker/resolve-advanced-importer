@@ -5,6 +5,8 @@ from resolve import (mediaPool)
 from time import sleep
 from tkinter.messagebox import showerror
 
+from resolveBinTree import ResolveBinTree
+
 class ResolveImporter(threading.Thread):
     
     DELAY_AFTER_REFRESH = 0.1
@@ -36,6 +38,70 @@ class ResolveImporter(threading.Thread):
             if not self.updateMessage("Importing..."): return
             
             self.importDir()
+            
+                
+            if c.timelinesBin or c.compoundClipsBin or c.fusionCompsBin:
+                master = ResolveBinTree.get()
+                
+                if c.timelinesBin:
+                    timelines = master.getTimelines()
+                    
+                    timelinesToMove = []
+                    for timeline in timelines:
+                        alreadyInBin = False
+                        
+                        for timelinesBinClip in c.timelinesBin.getClips():
+                            if timelinesBinClip.GetMediaId() == timeline.GetMediaId():
+                                alreadyInBin = True
+                                break
+                            
+                        if not alreadyInBin:
+                            timelinesToMove.append(timeline)
+                            
+                    if len(timelinesToMove) > 0:
+                        c.timelinesBin.moveClipsToBin(timelinesToMove)
+                        print(f"[Resolve Importer] Moved {[t.GetClipProperty('Clip Name') for t in timelinesToMove]} timelines to {c.timelinesBin.getPath()}")
+                    
+                if c.compoundClipsBin:
+                    compoundClips = master.getCompoundClips()
+                    
+                    compoundClipsToMove = []
+                    for clip in compoundClips:
+                        alreadyInBin = False
+                        
+                        for compBinClip in c.compoundClipsBin.getClips():
+                            if compBinClip.GetMediaId() == clip.GetMediaId():
+                                alreadyInBin = True
+                                break
+                            
+                        if not alreadyInBin:
+                            compoundClipsToMove.append(clip)
+                    
+                    if len(compoundClipsToMove) > 0:
+                        c.compoundClipsBin.moveClipsToBin(compoundClipsToMove)
+                        print(f"[Resolve Importer] Moved {[c.GetClipProperty('Clip Name') for c in compoundClipsToMove]} compound clips to {c.compoundClipsBin.getPath()}")
+                    
+                if c.fusionCompsBin:
+                    fusionComps = master.getFusionComps()
+                    
+                    fusionCompsToMove = []
+                    for clip in fusionComps:
+                        alreadyInBin = False
+                        
+                        for compBinClip in c.fusionCompsBin.getClips():
+                            if compBinClip.GetMediaId() == clip.GetMediaId():
+                                alreadyInBin = True
+                                break
+                            
+                        if not alreadyInBin:
+                            fusionCompsToMove.append(clip)
+                    
+                    if len(fusionCompsToMove) > 0:
+                        c.fusionCompsBin.moveClipsToBin(fusionCompsToMove)
+                        print(f"[Resolve Importer] Moved {[c.GetClipProperty('Clip Name') for c in fusionComps]} fusion comps to {c.fusionCompsBin.getPath()}")
+                    
+                master.refresh()
+            
             if not self.updateMessage("Importing... Finished Import"): return
             sleep(self.IMPORTED_MESSAGE_DURATION)
             

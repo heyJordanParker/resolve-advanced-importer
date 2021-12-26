@@ -1,6 +1,10 @@
 # Mac stuff
 .DS_Store
 
+# publishing stuff
+Resolve Advanced Importer/
+Resolve Advanced Importer.*
+
 # node stuff
 node_modules/
 package.json

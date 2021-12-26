@@ -1,6 +1,7 @@
+import sys
+import os
 import json
 import tkinter as tk
-from resolveBinTree import *
 
 DOCUMENTATION_URL = "https://neverproductive.notion.site/Resolve-Advanced-Importer-50f1a8a6241d4264824602054c499b31"
 
@@ -29,9 +30,17 @@ compoundClipsBin = None
 fusionCompsBin = None
 ignoredBins = []
 
+def getConfigPath():
+    if getattr(sys, 'frozen', False):
+        application_path = os.path.dirname(sys.executable)
+    else:
+        application_path = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(application_path, 'config.json')
+
 def loadCache():
     global sleepBetweenChecks, folderPath, ignoredBinsEntry, ignoredFileExtensions, removeExtraFiles, removeEmptyBins, unzipArchives, deleteUnzippedArchives, importToBinPath, timelinesBinPath, compoundClipsBinPath, fusionCompsBinPath
-    with open("config.json", "r") as configFile:
+    with open(getConfigPath(), "r") as configFile:
         data = json.load(configFile)
         sleepBetweenChecks = data["sleepBetweenChecks"]
         folderPath.set(data["folderPath"])
@@ -45,10 +54,10 @@ def loadCache():
         timelinesBinPath = data["timelinesBinPath"]
         compoundClipsBinPath = data["compoundClipsBinPath"]
         fusionCompsBinPath = data["fusionCompsBinPath"]
-        
+
 def saveCache():
     data = None
-    with open("config.json", "r") as configFile:
+    with open(getConfigPath(), "r") as configFile:
         data = json.load(configFile)
         data["folderPath"] = folderPath.get()
         data["ignoredBinsEntry"] = ignoredBinsEntry.get()
@@ -60,11 +69,18 @@ def saveCache():
         data["importToBinPath"] = importToBinPath
         data["timelinesBinPath"] = timelinesBinPath
         data["compoundClipsBinPath"] = compoundClipsBinPath
-        data["fusionCompsBinPath"] = fusionCompsBinPath 
+        data["fusionCompsBinPath"] = fusionCompsBinPath
 
-    with open("config.json", "w") as configFile:
+    with open(getConfigPath(), "w") as configFile:
         json.dump(data, configFile, indent=4)
-        
+
+def getResolvePath():
+    with open(getConfigPath(), "r") as file:
+        data = json.load(file)
+        resolvePath = data["resolvePath"]
+
+    return resolvePath
+
 loadCache()
-        
-        
+
+

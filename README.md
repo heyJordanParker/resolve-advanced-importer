@@ -12,12 +12,17 @@ I'll update this later
 
 ## How to develop:
 
-Test with:
+Test with ("npm i nodemon" first):
 ```
-nodemon .\resolveAdvancedImporter.py 
+nodemon resolveAdvancedImporter.py
 ```
 
-Create installer with:
+Create Windows exe with:
 ```
-pyinstaller -F  --noconsole .\resolveAdvancedImporter.py && copy config.json dist\config.json
+pyinstaller -F --noconsole .\resolveAdvancedImporter.py && copy config.json dist\config.json
+```
+
+Create OSX app with:
+```
+pyinstaller -F --noconsole ./resolveAdvancedImporter.py && cp config.json dist/resolveAdvancedImporter.app/Contents/MacOS/config.json
 ```

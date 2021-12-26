@@ -2,15 +2,14 @@ import sys
 import imp
 import os
 import json
+import config as c
 
 def GetResolve():
     scriptModule = None
     try:
         import fusionscript as scriptModule
     except ImportError:
-        with open("config.json", "r") as file:
-            data = json.load(file)
-            resolvePath = data["resolvePath"]
+        resolvePath = c.getResolvePath()
         # Look for an auto importer config path
         if resolvePath:
             try:
@@ -18,7 +17,7 @@ def GetResolve():
             except ImportError:
                 print("[Resolve Importer] Failed to load resolve at config path: " + resolvePath)
                 pass
-            
+
         if not scriptModule:
             # Look for installer based environment variables:
             libPath=os.getenv("RESOLVE_SCRIPT_LIB")
@@ -27,7 +26,7 @@ def GetResolve():
                     scriptModule = imp.load_dynamic("fusionscript", libPath)
                 except ImportError:
                     pass
-            
+
         if not scriptModule:
             # Look for default install locations:
             ext=".so"

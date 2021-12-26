@@ -2,12 +2,13 @@ import os
 from posixpath import dirname
 import zipfile
 import config as c
+from os.path import normpath
 from pathHelpers import *
 from resolve import (mediaPool)
 from clipTypes import ResolveClipTypes
 
 # Clip Name: c.GetClipProperty('Clip Name') # GetName doesn't work for all types
-# Clip Path c.GetClipProperty('File Path')
+# Clip Path: c.GetClipProperty('File Path')
 
 class ResolveBinTree:
     BIN_PATH_SEPARATOR = "/"
@@ -16,6 +17,23 @@ class ResolveBinTree:
     def __init__(self, bin, parent = None) -> None:
         self.bin = bin
         self.parent = parent
+        self.name = self.bin.GetName()
+        self.childBins = []
+        
+        # get path
+        currentBin = self
+            
+        path = ""
+        
+        while currentBin:
+            path = self.BIN_PATH_SEPARATOR + currentBin.getName() + path
+            currentBin = currentBin.getParent()
+            
+        # remove the first slash
+        path = path[1:]
+        
+        self.path = path
+        
         self.refresh()
         
     def __str__(self) -> str:
@@ -31,34 +49,48 @@ class ResolveBinTree:
         if not isinstance(other, ResolveBinTree):
             return False
         
-        return self.getPath() == other.getPath()
+        return self.getPath() == other.getPath() and len(self.getChildBins()) == len(other.getChildBins())
     
     def __hash__(self) -> int:
-        return hash(self.getPath())
+        return hash(self.getPath()) * len(self.getChildBins())
+    
+    def refresh(self):
+        self.clips = self.bin.GetClipList()
+        
+        foundBinTrees = []
+        noBinTreeFolders = []
+        
+        for folder in self.bin.GetSubFolderList():
+            found = False
+            for childBin in self.childBins:
+                if self.isChildBinResolveFolder(childBin, folder):
+                    found = True
+                    foundBinTrees.append(childBin)
+                    break
+                
+            if not found:
+                noBinTreeFolders.append(folder)
+        
+        extraBinTrees = [bt for bt in self.childBins if bt not in foundBinTrees]
+        
+        for extraBinTree in extraBinTrees:
+            self.childBins.remove(extraBinTree)
+            
+        for folder in noBinTreeFolders:
+            self.childBins.append(ResolveBinTree(folder, self))
             
     def get():
         ResolveBinTree.Instance.refresh()
         return ResolveBinTree.Instance
     
     def getName(self):
-        return self.bin.GetName()
+        return self.name
     
     def getParent(self):
         return self.parent
     
     def getPath(self):
-        currentBin = self
-        
-        path = ""
-        
-        while currentBin:
-            path = self.BIN_PATH_SEPARATOR + currentBin.getName() + path
-            currentBin = currentBin.getParent()
-            
-        # remove the first slash
-        path = path[1:]
-            
-        return path
+        return self.path
                    
     def getBinPathsRecursive(self):
         paths = []
@@ -94,12 +126,6 @@ class ResolveBinTree:
                 return pathInChildBin
             
         return default
-        
-    def refresh(self):
-        self.clips = self.bin.GetClipList()
-        self.childBins = []
-        for childBin in self.bin.GetSubFolderList():
-            self.childBins.append(ResolveBinTree(childBin, self))
             
     def hasClips(self):
         return not not self.clips
@@ -124,6 +150,18 @@ class ResolveBinTree:
             for bin in self.getChildBins():
                 if not bin.isEmpty():
                     return False
+        
+        return True
+    
+    def isChildBinResolveFolder(self, childBin, resolveFolder):
+        if childBin not in self.getChildBins():
+            return False
+        
+        if len(childBin.getChildBins()) != len(resolveFolder.GetSubFolderList()):
+            return False
+        
+        if childBin.getPath() != self.getPath() + self.BIN_PATH_SEPARATOR + resolveFolder.GetName():
+            return False
         
         return True
     
@@ -185,7 +223,7 @@ class ResolveBinTree:
         files.extend(self.getClipsByType(True, True, *ResolveClipTypes.getImportedTypes()))
         
         for file in files:
-            if not os.path.exists(file.GetClipProperty()['File Path']):
+            if not os.path.exists(normpath(file.GetClipProperty()['File Path'])):
                 missingFiles.append(file)
                 
         return missingFiles
@@ -242,7 +280,7 @@ class ResolveBinTree:
         
         if deleteFiles:
             for file in files:
-                os.remove(file.GetClipProperty()['File Path'])
+                os.remove(normpath(file.GetClipProperty()['File Path']))
             
         mediaPool.DeleteClips(files)
         
@@ -272,7 +310,7 @@ class ResolveBinTree:
             for root, dirs, files in os.walk(folder):
                 # add missing files
                 for file in files:
-                    filePath = os.path.join(root, file)
+                    filePath = normpath(os.path.join(root, file))
                     
                     # handle archives
                     if zipfile.is_zipfile(filePath):
@@ -298,7 +336,7 @@ class ResolveBinTree:
                         continue
                     
                     # is the file already imported
-                    importedFile = next((f for f in self.getClips() if f.GetClipProperty()['File Path'] == filePath), None)
+                    importedFile = next((f for f in self.getClips() if normpath(f.GetClipProperty()['File Path']) == filePath), None)
                     
                     if not importedFile:
                         mediaPool.SetCurrentFolder(self.getBin())
@@ -313,7 +351,7 @@ class ResolveBinTree:
                         
                         self.clips.append(importedFile)
                             
-                    importedFiles.append(importedFile)
+                    importedFiles.append(importedFile.GetClipProperty()['File Path'])
                     
                 # add missing folders
                 for dir in dirs:
@@ -350,8 +388,9 @@ class ResolveBinTree:
         if c.removeExtraFiles.get() and not self.isIgnored():
             for clip in self.getClips():
                 if(ResolveClipTypes.isImported(clip) and      # is a file type we can import
-                    not clip in importedFiles and             # is not already imported
+                    not clip.GetClipProperty()['File Path'] in importedFiles and             # is not already imported
                     int(clip.GetClipProperty("Usage")) == 0): # is not used
+                        print(f"[{self.getName()}] Removing unused file {importedFiles} and is clip imported {not clip in importedFiles}")
                         self.deleteClips([clip], deleteFiles=False, refresh=False)
                 
         # remove empty bins

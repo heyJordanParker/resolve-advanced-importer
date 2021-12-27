@@ -19,6 +19,7 @@ class ResolveBinTree:
         self.parent = parent
         self.name = self.bin.GetName()
         self.childBins = []
+        self.notAddedFiles = set()
         
         # get path
         currentBin = self
@@ -79,7 +80,13 @@ class ResolveBinTree:
         for folder in noBinTreeFolders:
             self.childBins.append(ResolveBinTree(folder, self))
             
+        for childBin in self.childBins:
+            childBin.refresh()
+            
     def get():
+        if not ResolveBinTree.Instance:
+            ResolveBinTree.Instance = ResolveBinTree(mediaPool.GetRootFolder())
+        
         ResolveBinTree.Instance.refresh()
         return ResolveBinTree.Instance
     
@@ -130,6 +137,16 @@ class ResolveBinTree:
     def hasClips(self):
         return not not self.clips
     
+    def hasClip(self, clip):
+        hasClip = False
+                        
+        for childClip in self.getBin().GetClipList():
+            if childClip.GetMediaId() == clip.GetMediaId():
+                hasClip = True
+                break
+            
+        return hasClip
+    
     def hasChildBins(self):
         return not not self.childBins
     
@@ -153,6 +170,7 @@ class ResolveBinTree:
         
         return True
     
+    # Check if child bin matches a resolve folder (because resolve folders don't have an ID :())
     def isChildBinResolveFolder(self, childBin, resolveFolder):
         if childBin not in self.getChildBins():
             return False
@@ -176,7 +194,7 @@ class ResolveBinTree:
             ignoredBinPaths.append(c.fusionCompsBin.getPath())
         
         for ignoredBinPath in ignoredBinPaths:
-            if self.getPath() in ignoredBinPath and len(self.getPath()) >= len(ignoredBinPath):
+            if ignoredBinPath in self.getPath() and len(self.getPath()) >= len(ignoredBinPath):
                 return True
             
         return False
@@ -306,76 +324,88 @@ class ResolveBinTree:
         importedFiles = []
         indexedChildBins = []
         
-        if folder:
-            for root, dirs, files in os.walk(folder):
-                # add missing files
-                for file in files:
-                    filePath = normpath(os.path.join(root, file))
-                    
-                    # handle archives
-                    if zipfile.is_zipfile(filePath):
-                        # unzip archives
-                        if c.unzipArchives.get():
-                            zipPath = getPathWithoutFileExtension(filePath)
-                            if not os.path.exists(zipPath):
-                                print(f"[{self.getName()}] Unzipping archive {filePath}")
-                                with zipfile.ZipFile(filePath,"r") as zip:
-                                    zip.extractall(zipPath)
-                                    dirs.append(getFolderNameFromPath(zipPath))
-                                
-                            if c.deleteUnzippedArchives.get():
-                                print(f"[{self.getName()}] Deleting unzipped archive {filePath}")
-                                os.remove(filePath)
-                                
-                        # no need to import zip files
-                        continue
-                    
-                    # is the file ignored
-                    if getFileExtensionFromPath(filePath) in ignoredFileExtensions:
-                        print(f"[{self.getName()}] Skipping ignored file (by extension) {filePath}")
-                        continue
-                    
-                    # is the file already imported
-                    importedFile = next((f for f in self.getClips() if normpath(f.GetClipProperty()['File Path']) == filePath), None)
-                    
-                    if not importedFile:
-                        mediaPool.SetCurrentFolder(self.getBin())
-                        importedFilesList = mediaPool.ImportMedia(filePath)
-                        print(f"[{self.getName()}] Adding File {filePath}")
-                        
-                        if not importedFilesList:
-                            print(f"[{self.getName()}] Failed Adding File {file}")
-                            continue
-                        
-                        importedFile = importedFilesList[0]
-                        
-                        self.clips.append(importedFile)
+        if not folder:
+            return
+            
+        for root, dirs, files in os.walk(folder):
+            # add missing files
+            for file in files:
+                filePath = normpath(os.path.join(root, file))
+                
+                if filePath in self.notAddedFiles:
+                    continue
+                
+                # handle archives
+                if zipfile.is_zipfile(filePath):
+                    # unzip archives
+                    if c.unzipArchives.get():
+                        zipPath = getPathWithoutFileExtension(filePath)
+                        if not os.path.exists(zipPath):
+                            print(f"[{self.getName()}] Unzipping archive {filePath}")
+                            with zipfile.ZipFile(filePath,"r") as zip:
+                                zip.extractall(zipPath)
+                                dirs.append(getFolderNameFromPath(zipPath))
                             
-                    importedFiles.append(importedFile.GetClipProperty()['File Path'])
+                        if c.deleteUnzippedArchives.get():
+                            print(f"[{self.getName()}] Deleting unzipped archive {filePath}")
+                            os.remove(filePath)
+                            
+                    # no need to import zip files
+                    continue
+                
+                # is the file ignored
+                if getFileExtensionFromPath(filePath) in ignoredFileExtensions:
+                    print(f"[{self.getName()}] Skipping ignored file (by extension) {filePath}")
+                    self.notAddedFiles.add(filePath)
+                    continue
+                
+                # is the file already imported
+                importedFile = next((f for f in self.getClips() if f and normpath(f.GetClipProperty()['File Path']) == filePath), None)
+                
+                if not importedFile:
+                    importedFilesList = mediaPool.ImportMedia(filePath)
+                    print(f"[{self.getName()}] Adding File {filePath}")
                     
-                # add missing folders
-                for dir in dirs:
-                    dirPath = os.path.join(root, dir)
-                    dirName = getFolderNameFromPath(dir)
-                    childBin = next((b for b in self.getChildBins() if b.getName() == dirName), None)
+                    if not importedFilesList:
+                        if(getFileNameFromPath(file).startswith(".")):
+                            print(f"[{self.getName()}] Skipping file that starts with . {filePath} (Resolve can't import those)")
+                        else:
+                            print(f"[{self.getName()}] Failed Adding File {file}")
+                        self.notAddedFiles.add(filePath)
+                        continue
                     
-                    if not childBin:
-                        newBin = mediaPool.AddSubFolder(self.getBin(), dirName)
+                    importedFile = importedFilesList[0]
+                    
+                    if not self.hasClip(importedFile):
+                        self.moveClipsToBin([importedFile], False)
+                    
+                    self.clips.append(importedFile)
                         
-                        if not newBin:
-                            print(f"[{self.getName()}] Failed adding bin {dirName}")
-                        
-                        print(f"[{self.getName()}] Adding new bin {dirName}")
-                        childBin = ResolveBinTree(newBin, self)
-                        self.childBins.append(childBin)
-                        
-                    indexedChildBins.append(childBin)
-                        
-                    if recursive:
-                        childBin.syncBinWithFolder(dirPath)
-                        
-                # we only want to process the current directory; let the bin tree handle the recursion
-                break
+                importedFiles.append(importedFile.GetClipProperty()['File Path'])
+                
+            # add missing folders
+            for dir in dirs:
+                dirPath = os.path.join(root, dir)
+                dirName = getFolderNameFromPath(dir)
+                childBin = next((b for b in self.getChildBins() if b.getName() == dirName), None)
+                
+                if not childBin:
+                    newBin = mediaPool.AddSubFolder(self.getBin(), dirName)
+                    
+                    if not newBin:
+                        print(f"[{self.getName()}] Failed adding bin {dirName}")
+                    
+                    print(f"[{self.getName()}] Adding new bin {dirName}")
+                    childBin = ResolveBinTree(newBin, self)
+                    self.childBins.append(childBin)
+                    
+                indexedChildBins.append(childBin)
+                    
+                if recursive:
+                    childBin.syncBinWithFolder(dirPath)
+                    
+            # we only want to process the current directory; let the bin tree handle the recursion
+            break
         
         # bins that are not in the folder    
         extraBins = list(set(self.getChildBins()) - set(indexedChildBins))
@@ -390,11 +420,9 @@ class ResolveBinTree:
                 if(ResolveClipTypes.isImported(clip) and      # is a file type we can import
                     not clip.GetClipProperty()['File Path'] in importedFiles and             # is not already imported
                     int(clip.GetClipProperty("Usage")) == 0): # is not used
-                        print(f"[{self.getName()}] Removing unused file {importedFiles} and is clip imported {not clip in importedFiles}")
+                        print(f"[{self.getName()}] Removing unused file {clip.GetClipProperty()['File Path']}")
                         self.deleteClips([clip], deleteFiles=False, refresh=False)
                 
         # remove empty bins
-        if c.removeEmptyBins.get():
+        if c.removeEmptyBins.get() and not self.isIgnored():
             self.getEmptyChildBins(indexedChildBins, recursive=False, delete=True)
-        
-ResolveBinTree.Instance = ResolveBinTree(mediaPool.GetRootFolder())

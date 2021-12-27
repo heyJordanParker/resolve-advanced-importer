@@ -9,7 +9,6 @@ from resolveBinTree import ResolveBinTree
 
 class ResolveImporter(threading.Thread):
     
-    DELAY_AFTER_REFRESH = 0.1
     IMPORTED_MESSAGE_DURATION = 0.7
     
     importerThread = None
@@ -28,7 +27,7 @@ class ResolveImporter(threading.Thread):
     
     def run(self):
         while True:
-            sleepDuration = c.sleepBetweenChecks - self.DELAY_AFTER_REFRESH - self.IMPORTED_MESSAGE_DURATION
+            sleepDuration = c.sleepBetweenChecks - self.IMPORTED_MESSAGE_DURATION
             if not self.updateMessage("Importing"): return
             sleep(sleepDuration/3)
             if not self.updateMessage("Importing."): return
@@ -39,7 +38,6 @@ class ResolveImporter(threading.Thread):
             
             self.importDir()
             
-                
             if c.timelinesBin or c.compoundClipsBin or c.fusionCompsBin:
                 master = ResolveBinTree.get()
                 
@@ -48,14 +46,7 @@ class ResolveImporter(threading.Thread):
                     
                     timelinesToMove = []
                     for timeline in timelines:
-                        alreadyInBin = False
-                        
-                        for timelinesBinClip in c.timelinesBin.getClips():
-                            if timelinesBinClip.GetMediaId() == timeline.GetMediaId():
-                                alreadyInBin = True
-                                break
-                            
-                        if not alreadyInBin:
+                        if not c.timelinesBin.hasClip(timeline):
                             timelinesToMove.append(timeline)
                             
                     if len(timelinesToMove) > 0:
@@ -67,14 +58,7 @@ class ResolveImporter(threading.Thread):
                     
                     compoundClipsToMove = []
                     for clip in compoundClips:
-                        alreadyInBin = False
-                        
-                        for compBinClip in c.compoundClipsBin.getClips():
-                            if compBinClip.GetMediaId() == clip.GetMediaId():
-                                alreadyInBin = True
-                                break
-                            
-                        if not alreadyInBin:
+                        if not c.compoundClipsBin.hasClip(clip):
                             compoundClipsToMove.append(clip)
                     
                     if len(compoundClipsToMove) > 0:
@@ -86,14 +70,7 @@ class ResolveImporter(threading.Thread):
                     
                     fusionCompsToMove = []
                     for clip in fusionComps:
-                        alreadyInBin = False
-                        
-                        for compBinClip in c.fusionCompsBin.getClips():
-                            if compBinClip.GetMediaId() == clip.GetMediaId():
-                                alreadyInBin = True
-                                break
-                            
-                        if not alreadyInBin:
+                        if not c.fusionCompsBin.hasClip(clip):
                             fusionCompsToMove.append(clip)
                     
                     if len(fusionCompsToMove) > 0:
@@ -115,15 +92,11 @@ class ResolveImporter(threading.Thread):
         return True
     
     def importDir(self):
-        initialBin = mediaPool.GetCurrentFolder()
+        print(f"[Resolve Importer] Importing from {self.directory} to {c.importToBin.getPath()}")
         
         c.importToBin.refresh()
         
-        sleep(self.DELAY_AFTER_REFRESH)
-        
         c.importToBin.syncBinWithFolder(self.directory, recursive = True)
-                
-        mediaPool.SetCurrentFolder(initialBin)
         
     def toggleImport():
         if(ResolveImporter.importerThread):
@@ -134,6 +107,8 @@ class ResolveImporter(threading.Thread):
         else:
             if not ResolveImporter.validateImportPath():
                 return
+            
+            c.saveCache()
             
             print(f"[Resolve Importer] Starting to Import from {c.folderPath.get()} to bin {c.importToBin.getPath()}")
             c.importing.set(True)

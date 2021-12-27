@@ -66,10 +66,10 @@ def saveCache():
         data["ignoredFileExtensions"] = ignoredFileExtensions.get()
         data["unzipArchives"] = unzipArchives.get()
         data["deleteUnzippedArchives"] = deleteUnzippedArchives.get()
-        data["importToBinPath"] = importToBinPath
-        data["timelinesBinPath"] = timelinesBinPath
-        data["compoundClipsBinPath"] = compoundClipsBinPath
-        data["fusionCompsBinPath"] = fusionCompsBinPath
+        data["importToBinPath"] = importToBin.getPath() if importToBin else "Master"
+        data["timelinesBinPath"] = timelinesBin.getPath() if timelinesBin else "None"
+        data["compoundClipsBinPath"] = compoundClipsBin.getPath() if compoundClipsBin else "None"
+        data["fusionCompsBinPath"] = fusionCompsBin.getPath() if fusionCompsBin else "None"
 
     with open(getConfigPath(), "w") as configFile:
         json.dump(data, configFile, indent=4)

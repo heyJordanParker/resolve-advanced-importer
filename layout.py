@@ -24,16 +24,16 @@ extraFunctionsFrame = ttk.LabelFrame(mainFrame, text="Extra Functions")
 disabledControlsDuringImport = []
 
 def initializeFrames():
-    mainFrame.grid(column=0, row=0, ipadx = 10, ipady = 10)
+    mainFrame.grid(column=0, row=0, padx = 10, pady = 10)
 
     for i in range(10):
         mainFrame.grid_rowconfigure(i, weight=1)
         mainFrame.grid_columnconfigure(i, weight=1)
 
-    folderPathFrame.grid(row = 0, sticky="nsew", ipady=5)
-    configFrame.grid(row = 1, sticky="nsew", ipady=5)
-    extraFunctionsFrame.grid(row = 2, sticky="nsew", ipady=5)
-    controlFrame.grid(row = 3, sticky="nsew", ipady=5)
+    folderPathFrame.grid(row = 0, sticky="nsew", pady=(0, 10), ipady=3)
+    configFrame.grid(row = 1, sticky="nsew", pady=(0, 10), ipady=3)
+    extraFunctionsFrame.grid(row = 2, sticky="nsew", pady=(0, 10), ipady=3)
+    controlFrame.grid(row = 3, sticky="nsew", pady=(0, 10), ipady=3)
 
     Grid.columnconfigure(controlFrame, 0, weight = 1)
 
@@ -60,7 +60,7 @@ def initializeFolderPathFrame():
 
     openFolderButton = ttk.Button(folderPathFrame, text='Select Folder', command=openFolderButton_Click, width=25)
     disabledControlsDuringImport.append(openFolderButton)
-    openFolderButton.grid(column = 2, row = 1, columnspan=1, padx=10)
+    openFolderButton.grid(column = 2, row = 1, columnspan=1, padx=(10, 0))
 
     rootBinLabel = ttk.Label(folderPathFrame, text="Select a root bin:")
     rootBinLabel.grid(row = 2, column=0, columnspan=2, sticky=tk.W)
@@ -70,7 +70,7 @@ def initializeFolderPathFrame():
         print(f"Initialized Root bin: {c.importToBin}")
 
     rootBinSelector = BinSelector(folderPathFrame, c.importToBinPath, selectRootBin, False, width=23)
-    rootBinSelector.grid(row=2, column=2, columnspan=1, sticky=tk.W, padx=10)
+    rootBinSelector.grid(row=2, column=2, columnspan=1, sticky=tk.W, padx=(10, 0))
     disabledControlsDuringImport.append(rootBinSelector)
 
     # Update the selected bin
@@ -83,7 +83,7 @@ def initializeConfigFrame():
     ignoredFileExtensionsLabel.grid(row=currentRow, column=0, columnspan=1, sticky=tk.EW)
 
     ignoredFileExtensionsEntry = ttk.Entry(configFrame, textvariable = c.ignoredFileExtensions)
-    ignoredFileExtensionsEntry.grid(row=currentRow, column=1, columnspan=2, sticky=tk.EW, padx=(20, 10), ipadx=97)
+    ignoredFileExtensionsEntry.grid(row=currentRow, column=1, columnspan=2, sticky=tk.EW, padx=(20, 0), ipadx=97)
     disabledControlsDuringImport.append(ignoredFileExtensionsEntry)
 
     def ignoredFileExtensionsEntry_FocusOut(e):
@@ -192,7 +192,7 @@ def initializeConfigFrame():
         ignoredBinSelector.set(clearLabel)
 
     ignoredBinSelector = BinSelector(configFrame, clearLabel, addIgnoredBin, True, clearLabel, width=23)
-    ignoredBinSelector.grid(row=currentRow, column=2, columnspan=1, sticky=tk.W, padx=10)
+    ignoredBinSelector.grid(row=currentRow, column=2, columnspan=1, sticky=tk.W, padx=(10, 0))
     disabledControlsDuringImport.append(ignoredBinSelector)
 
     updateIgnoredBins(None)
@@ -233,14 +233,14 @@ def initializeExtraFunctionsFrame():
     currentRow = 0
 
     timelineBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all timelines to bin:")
-    timelineBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    timelineBinLabel.grid(row = currentRow, columnspan=2, pady = (10, 10), sticky=tk.EW)
 
     def selectTimelinesBin(e):
         c.timelinesBin = timelineBinSelector.getSelectedBin()
         print(f"Initialized Timelines bin: {c.timelinesBin}")
 
     timelineBinSelector = BinSelector(extraFunctionsFrame, c.timelinesBinPath, selectTimelinesBin, True, width=23)
-    timelineBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    timelineBinSelector.grid(row=currentRow, column=2, columnspan=3, pady = (10, 10), sticky=tk.E)
     disabledControlsDuringImport.append(timelineBinSelector)
 
     selectTimelinesBin(None)
@@ -248,7 +248,7 @@ def initializeExtraFunctionsFrame():
     currentRow += 1
 
     compoundClipsBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all compound clips to bin:")
-    compoundClipsBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    compoundClipsBinLabel.grid(row = currentRow, columnspan=2, pady = (0, 10), sticky=tk.EW)
 
     def selectCompoundClipsBin(e):
         c.compoundClipsBin = compounClipsBinSelector.getSelectedBin()
@@ -256,7 +256,7 @@ def initializeExtraFunctionsFrame():
 
 
     compounClipsBinSelector = BinSelector(extraFunctionsFrame, c.compoundClipsBinPath, selectCompoundClipsBin, True, width=23)
-    compounClipsBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    compounClipsBinSelector.grid(row=currentRow, column=2, columnspan=3, pady = (0, 10), sticky=tk.E)
     disabledControlsDuringImport.append(compounClipsBinSelector)
 
     selectCompoundClipsBin(None)
@@ -264,14 +264,14 @@ def initializeExtraFunctionsFrame():
     currentRow += 1
 
     fusionCompsBinLabel = ttk.Label(extraFunctionsFrame, text = "Automatically move all fusion comps to bin:")
-    fusionCompsBinLabel.grid(row = currentRow, columnspan=2, pady = 10, sticky=tk.EW)
+    fusionCompsBinLabel.grid(row = currentRow, columnspan=2, pady = (0, 10), sticky=tk.EW)
 
     def selectFusionCompsBin(e):
         c.fusionCompsBin = fusionCompsBinSelector.getSelectedBin()
         print(f"Initialized Fusion comps bin: {c.fusionCompsBin}")
 
     fusionCompsBinSelector = BinSelector(extraFunctionsFrame, c.fusionCompsBinPath, selectFusionCompsBin, True, width=23)
-    fusionCompsBinSelector.grid(row=currentRow, column=2, columnspan=3, sticky=tk.E)
+    fusionCompsBinSelector.grid(row=currentRow, column=2, columnspan=3, pady = (0, 10), sticky=tk.E)
     disabledControlsDuringImport.append(fusionCompsBinSelector)
 
     selectFusionCompsBin(None)
@@ -279,7 +279,7 @@ def initializeExtraFunctionsFrame():
     currentRow += 1
 
     manuallyRemoveLabel = ttk.Label(extraFunctionsFrame, text="Manually Remove:")
-    manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, pady = (10,0), padx=(0, 160))
+    manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, padx=(0, 160))
 
     def deleteUnusedFilesButton_Click():
         unusedFiles = ResolveBinTree.get().getUnusedFiles()
@@ -302,7 +302,7 @@ def initializeExtraFunctionsFrame():
 
     removeUnusedFilesButton = ttk.Button(extraFunctionsFrame, text="Unused Files", command=deleteUnusedFilesButton_Click)
 
-    removeUnusedFilesButton.grid(row=currentRow, column=1, sticky=tk.W, padx=(20, 0), pady = (10,0), ipadx=14)
+    removeUnusedFilesButton.grid(row=currentRow, column=1, sticky=tk.W, padx=(20, 0), ipadx=14)
     disabledControlsDuringImport.append(removeUnusedFilesButton)
 
     def removeMissingClipsButton_Click():
@@ -325,7 +325,7 @@ def initializeExtraFunctionsFrame():
             c.importToBin.deleteClips(missingClips, refresh=True)
 
     removeMissingClipsButton = ttk.Button(extraFunctionsFrame, text="Missing Clips", command=removeMissingClipsButton_Click)
-    removeMissingClipsButton.grid(row=currentRow, column=2, sticky=tk.W, padx=(20, 0), pady = (10,0), ipadx=14)
+    removeMissingClipsButton.grid(row=currentRow, column=2, sticky=tk.W, padx=(20, 0), ipadx=14)
     disabledControlsDuringImport.append(removeMissingClipsButton)
 
     def removeEmptyBinsButton_Click():
@@ -344,12 +344,12 @@ def initializeExtraFunctionsFrame():
                     message=f"{len(emptyBins)} empty bins will be removed from Resolve. \n\n{binPaths}\nRemoving empty bins should not have any significant impact on your project.", icon = WARNING)
 
         if confirm:
-            currentBin = mediaPool.GetCurrentFolder()
+            initialBin = mediaPool.GetCurrentFolder()
             ResolveBinTree.get().getEmptyChildBins(recursive=True, delete=True)
-            mediaPool.SetCurrentFolder(currentBin)
+            mediaPool.SetCurrentFolder(initialBin)
 
     removeEmptyBinsButton = ttk.Button(extraFunctionsFrame, text="Empty Bins", command=removeEmptyBinsButton_Click)
-    removeEmptyBinsButton.grid(row=currentRow, column=3, sticky=tk.W, padx=(20, 0), pady = (10,0), ipadx=14)
+    removeEmptyBinsButton.grid(row=currentRow, column=3, sticky=tk.W, padx=(20, 0), ipadx=14)
     disabledControlsDuringImport.append(removeEmptyBinsButton)
 
 def initializeControlFrame():

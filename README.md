@@ -14,15 +14,15 @@ I'll update this later
 
 Test with ("npm i nodemon" first):
 ```
-nodemon resolveAdvancedImporter.py
+nodemon .\resolveAdvancedImporter.py --ignore *json
 ```
 
 Create Windows exe with:
 ```
-pyinstaller -F --noconsole .\resolveAdvancedImporter.py && copy config.json dist\config.json
+pyinstaller -F --noconsole .\resolveAdvancedImporter.py && copy config.json dist\config.json && ren dist "Resolve Advanced Importer"
 ```
 
 Create OSX app with:
 ```
-pyinstaller -F --noconsole ./resolveAdvancedImporter.py && cp config.json dist/resolveAdvancedImporter.app/Contents/MacOS/config.json
+pyinstaller -F --noconsole ./resolveAdvancedImporter.py && cp config.json dist/resolveAdvancedImporter.app/Contents/MacOS/config.json && mv dist "Resolve Advanced Importer"
 ```

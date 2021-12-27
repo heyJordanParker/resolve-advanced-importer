@@ -5,7 +5,7 @@
     "ignoredBinsEntry": "",
     "removeExtraFiles": false,
     "removeEmptyBins": false,
-    "ignoredFileExtensions": "json,ini",
+    "ignoredFileExtensions": "json,ini,svg,txt,setting,drp,rtf",
     "unzipArchives": false,
     "deleteUnzippedArchives": false,
     "importToBinPath": "Master",

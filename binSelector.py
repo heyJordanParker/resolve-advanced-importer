@@ -11,7 +11,7 @@ class BinSelector(ttk.Combobox):
         self.noneLabel = noneLabel
         self.binPaths = self.generateBinPaths()
         
-        self.selectedBin = self.findSelectedBinFromPath(selectedBinLabel)
+        self.selectedBin, selectedBinLabel = self.findSelectedBinFromPath(selectedBinLabel)
         
         self.selectedBinLabelVar = tk.StringVar(value = selectedBinLabel)
         
@@ -40,18 +40,17 @@ class BinSelector(ttk.Combobox):
     
     def findSelectedBinFromPath(self, selectedBinPath):
         if self.allowNoSelection and selectedBinPath == self.noneLabel:
-            return None
+            return None, self.noneLabel
         
         masterBin = ResolveBinTree.get()
-        defaultBin = None if self.allowNoSelection else masterBin
         
-        bin = masterBin.findBinFromPath(selectedBinPath, defaultBin)
+        bin = masterBin.findBinFromPath(selectedBinPath, None if self.allowNoSelection else masterBin)
         
-        if bin == defaultBin:
+        if bin == None:
+            print(f"[Bin Selector] Failed to find bin from path {selectedBinPath}")
             selectedBinPath = masterBin.getPath() if masterBin else ""
-            print("[Bin Selector] Failed to find bin")
             
-        return bin
+        return bin, selectedBinPath
         
     
     def setSelectedBin(self, selectedBin, selectedBinLabel = None):
@@ -86,7 +85,7 @@ class BinSelector(ttk.Combobox):
     def onItemSelected(self, event):
         selectedBinPath = self.selectedBinLabelVar.get()
         
-        bin = self.findSelectedBinFromPath(selectedBinPath)
+        bin, selectedBinPath = self.findSelectedBinFromPath(selectedBinPath)
         
         self.setSelectedBin(bin, selectedBinPath)
         self.selectBinFunction(event)

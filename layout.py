@@ -360,7 +360,7 @@ def initializeControlFrame():
         controlFrame,
         orient='horizontal',
         mode='indeterminate',
-        length=280,
+        length=260,
     )
     progressIndicator.grid(row = 2, column=0, columnspan=2, sticky=tk.W)
     progressIndicator.grid_remove()

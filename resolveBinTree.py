@@ -199,24 +199,24 @@ class ResolveBinTree:
             
         return False
     
-    def getTimelines(self, recursive = True):
+    def getTimelines(self, recursive = True, respectIgnore = True):
         timelines = []
         
-        timelines.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Timeline))
+        timelines.extend(self.getClipsByType(recursive, respectIgnore, ResolveClipTypes.Timeline))
         
         return timelines
     
-    def getCompoundClips(self, recursive = True):
+    def getCompoundClips(self, recursive = True, respectIgnore = True):
         compoundClips = []
         
-        compoundClips.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Compound))
+        compoundClips.extend(self.getClipsByType(recursive, respectIgnore, ResolveClipTypes.Compound))
         
         return compoundClips
     
-    def getFusionComps(self, recursive = True):
+    def getFusionComps(self, recursive = True, respectIgnore = True):
         comps = []
         
-        comps.extend(self.getClipsByType(recursive, False, ResolveClipTypes.Generator, ResolveClipTypes.Fusion))
+        comps.extend(self.getClipsByType(recursive, respectIgnore, ResolveClipTypes.Generator, ResolveClipTypes.Fusion))
         
         return comps
     

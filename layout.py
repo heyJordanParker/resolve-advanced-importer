@@ -278,7 +278,7 @@ def initializeExtraFunctionsFrame():
 
     currentRow += 1
 
-    manuallyRemoveLabel = ttk.Label(extraFunctionsFrame, text="Manually Remove:")
+    manuallyRemoveLabel = ttk.Label(extraFunctionsFrame, text="Manually Delete:")
     manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, padx=(0, 160))
 
     def deleteUnusedFilesButton_Click():
@@ -294,7 +294,7 @@ def initializeExtraFunctionsFrame():
             i += 1
 
         confirm = askokcancel(title="Confirm Deletion of Unused Files",
-                    message=f"{len(unusedFiles)} unused files will be removed from Resolve:\n\n{filePaths}\nThose can easily be found using a Smart Bin.\n\nNote: Use the help button to go to a page that explains that and more.", icon = WARNING)
+                    message=f"{len(unusedFiles)} unused files will be deleted from both Resolve and your filesystem:\n\n{filePaths}\nThose can easily be found using a Smart Bin.\n\nNote: Use the help button to go to a page that explains that and more.", icon = WARNING)
 
         if confirm:
             print(f"[{c.importToBin.getName()}] Deleting {len(unusedFiles)} unused files.")

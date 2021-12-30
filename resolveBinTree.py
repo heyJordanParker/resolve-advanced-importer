@@ -332,9 +332,6 @@ class ResolveBinTree:
             for file in files:
                 filePath = normpath(os.path.join(root, file))
                 
-                if filePath in self.notAddedFiles:
-                    continue
-                
                 # handle archives
                 if zipfile.is_zipfile(filePath):
                     # unzip archives
@@ -351,6 +348,9 @@ class ResolveBinTree:
                             os.remove(filePath)
                             
                     # no need to import zip files
+                    continue
+                
+                if filePath in self.notAddedFiles:
                     continue
                 
                 # is the file ignored

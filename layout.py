@@ -345,7 +345,7 @@ def initializeExtraFunctionsFrame():
 
         if confirm:
             initialBin = mediaPool.GetCurrentFolder()
-            ResolveBinTree.get().getEmptyChildBins(recursive=True, delete=True)
+            ResolveBinTree.get().getEmptyChildBins([c.importToBin], recursive=True, delete=True)
             mediaPool.SetCurrentFolder(initialBin)
 
     removeEmptyBinsButton = ttk.Button(extraFunctionsFrame, text="Empty Bins", command=removeEmptyBinsButton_Click)

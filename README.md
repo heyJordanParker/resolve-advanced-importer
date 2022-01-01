@@ -8,7 +8,7 @@ Resolve is an amazing NLE but lacks a lot of the basic functionality and polish 
 
 ## How to use:
 
-I'll update this later
+Read the [How to Use Instructions in Notion](https://neverproductive.notion.site/DaVinci-Resolve-Advanced-Importer-50f1a8a6241d4264824602054c499b31).
 
 ## How to develop:
 

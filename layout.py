@@ -279,7 +279,7 @@ def initializeExtraFunctionsFrame():
     currentRow += 1
 
     manuallyRemoveLabel = ttk.Label(extraFunctionsFrame, text="Manually Delete:")
-    manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, padx=(0, 160))
+    manuallyRemoveLabel.grid(row=currentRow, column=0, sticky=tk.EW, padx=(0, 172))
 
     def deleteUnusedFilesButton_Click():
         unusedFiles = ResolveBinTree.get().getUnusedFiles()

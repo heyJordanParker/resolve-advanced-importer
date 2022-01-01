@@ -1,5 +1,4 @@
 import os
-from posixpath import dirname
 import zipfile
 import config as c
 from os.path import normpath

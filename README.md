@@ -8,7 +8,14 @@ Resolve is an amazing NLE but lacks a lot of the basic functionality and polish 
 
 ## How to use:
 
-Read the [How to Use Instructions Notion Page](https://neverproductive.notion.site/DaVinci-Resolve-Advanced-Importer-50f1a8a6241d4264824602054c499b31).
+1. Set your Resolve External Scripting Setting setting to Local.
+2. Start Resolve and open a project (the importer works with the opened project).
+3. Start the importer.
+4. Pick a directory to sync.
+5. Pick a bin to sync that directory to.
+6. Click "Start Auto Importer".
+
+For more detailed instructions, screenshots, and info on the advanced settings, read the [How to Use Instructions Notion Page](https://neverproductive.notion.site/DaVinci-Resolve-Advanced-Importer-50f1a8a6241d4264824602054c499b31).
 
 ## How to develop:
 
